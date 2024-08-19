@@ -137,7 +137,7 @@ extension SDBeaconScanner: CLLocationManagerDelegate {
 
             let newBeaconFound = self.processRangedBeacons(rangedBeacons: beacons)
 
-            if isTimeUp && !newBeaconFound {
+            if isTimeUp, !newBeaconFound {
                 // Stop scanning if the time is up and no new beacons were found since last scan
                 consoleLog("Stopping beacon scan due to found beacons \(Date.currentMillis())")
                 self.stopScanningAndReportResults(error: nil)
@@ -231,13 +231,12 @@ private extension SDBeaconScanner {
         var newBeaconFound = false
         for beacon in rangedBeacons {
             if let index = foundBeacons.firstIndex(where: { $0.beacon.uuid == beacon.uuid && $0.beacon.major == beacon.major && $0.beacon.minor == beacon.minor }) {
-                
                 // Update existing beacon with new timestamp
                 foundBeacons[index] = TimestampedBeacon(
                     beacon: beacon,
                     timestamp: currentTimestampMillis
                 )
-                
+
                 consoleLog("Updated existing beacon with UUID: \(beacon.uuid.uuidString), Major: \(beacon.major.intValue), Minor: \(beacon.minor.intValue)")
             } else {
                 // Add new beacon
@@ -252,7 +251,7 @@ private extension SDBeaconScanner {
         foundBeacons.sort {
             $0.beacon.proximity.rawValue < $1.beacon.proximity.rawValue
         }
-        
+
         return newBeaconFound
     }
 
@@ -298,8 +297,8 @@ private extension SDBeaconScanner {
 
 func consoleLog(_ items: Any...) {
     #if DEBUG
-    for item in items {
-        Swift.print("\(item)")
-    }
+        for item in items {
+            Swift.print("\(item)")
+        }
     #endif
 }
