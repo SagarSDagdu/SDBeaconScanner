@@ -31,6 +31,29 @@ Add SDBeaconScanner to your project using Swift Package Manager:
 
 You can manually copy the files under `Sources/SDBeaconScanner` to your project.
 
+## 🔒 Permissions
+Ensure that your app includes the necessary permissions in `Info.plist` to use location services:
+
+```xml
+<key>NSLocationWhenInUseUsageDescription</key>
+<string>We need your location to scan for beacons.</string>
+<key>NSLocationAlwaysUsageDescription</key>
+<string>We need your location to scan for beacons even when the app is in the background.</string>
+<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+<string>We need your location to scan for beacons.</string>
+```
+
+## 🔧 Project Configuration
+Background Location Updates
+To enable scanning for beacons while your app is in the background, ensure that your app has the correct background modes enabled in Info.plist:
+
+```xml
+<key>UIBackgroundModes</key>
+<array>
+    <string>location</string>
+</array>
+```
+
 ## Usage
 
 ### 1. Importing the Library
