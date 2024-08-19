@@ -21,14 +21,14 @@ SDBeaconScanner is a Swift library for scanning Bluetooth beacons using CoreLoca
 7. [Example](#example)
 8. [License](#license)
 
-## 🚀 Features
+## Features
 
 - **Beacon Scanning:** Scan for nearby Bluetooth beacons by UUID, with optional major and minor values.
 - **Customizable Timeout:** Specify a custom timeout for the scan to avoid indefinite scanning.
 - **Completion Handlers:** Results are returned via completion handlers, making it easy to integrate with your existing app logic.
 - **Error Handling:** Provides detailed errors, including invalid UUID, unavailable ranging, and generic errors via NSError.
 
-## 📋 Requirements
+## Requirements
 
 - iOS 13.0+
 - Swift 5.0+
@@ -49,7 +49,7 @@ Add SDBeaconScanner to your project using Swift Package Manager:
 
 You can manually copy the files under `Sources/SDBeaconScanner` to your project.
 
-## 🔒 Permissions
+## Permissions
 Ensure that your app includes the necessary permissions in `Info.plist` to use location services:
 
 ```xml
@@ -61,7 +61,7 @@ Ensure that your app includes the necessary permissions in `Info.plist` to use l
 <string>We need your location to scan for beacons.</string>
 ```
 
-## 🔧 Project Configuration
+## Project Configuration
 
 ### Background Location Updates
 To enable scanning for beacons while your app is in the background, ensure that your app has the correct background modes enabled in Info.plist:
@@ -73,7 +73,7 @@ To enable scanning for beacons while your app is in the background, ensure that 
 </array>
 ```
 
-## 🧑🏻‍💻 Usage
+## Usage
 
 ### 1. Importing the Library
 
@@ -162,10 +162,10 @@ if let error = error as? BeaconScannerError {
 }
 ```
 
-## 📄 Example
+## Example
 
 You can find a simple example project in the [Example](/Example) directory. The example demonstrates how to scan for beacons using `SDBeaconScanner`.
 
-## 🪪 License
+## License
 
 SDBeaconScanner is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
