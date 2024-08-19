@@ -17,7 +17,7 @@ public enum BeaconScannerError: Error {
 
     /// Ranging is unavailable on the device
     case rangingUnavailable
-    
+
     /// A generic error with an associated ``NSError`` object. This error will be reported when the location manager notifies and error through the `didFailRangingFor` delegate method
     case rangingFailed(NSError)
 }
@@ -43,7 +43,7 @@ public final class SDBeaconScanner: NSObject {
     private var noBeaconsFoundTimeoutTimer: DispatchSourceTimer?
 
     private var scanStartTimestampMillis: Int64 = 0
-        
+
     /// The location manager used for ranging beacons
     private let locationManager: CLLocationManager
 
