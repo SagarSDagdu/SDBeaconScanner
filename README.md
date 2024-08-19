@@ -5,21 +5,21 @@ SDBeaconScanner is a Swift library for scanning Bluetooth beacons using CoreLoca
 
 ## Table of Contents
 
-1. [Features](#features)
-2. [Requirements](#requirements)
-3. [Installation](#installation)
+[Features](#features)
+[Requirements](#requirements)
+[Installation](#installation)
     - [Swift Package Manager](#swift-package-manager)
     - [Manually](#manually)
-4. [Permissions](#permissions)
-5. [Project Configuration](#project-configuration)
-6. [Usage](#usage)
+[Permissions](#permissions)
+[Project Configuration](#project-configuration)
+[Usage](#usage)
     - [Importing the Library](#1-importing-the-library)
     - [Initializing the Scanner](#2-initializing-the-scanner)
     - [Scanning for Beacons](#3-scanning-for-beacons)
     - [Customizing the Timeout](#4-customizing-the-timeout)
     - [Handling Results and Errors](#5-handling-results-and-errors)
-7. [Example](#example)
-8. [License](#license)
+[Example](#example)
+[License](#license)
 
 ## Features
 
