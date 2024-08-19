@@ -42,7 +42,10 @@ Add SDBeaconScanner to your project using Swift Package Manager:
 
 1. Open your Xcode project.
 2. Select **File** > **Add Packages**.
-3. Paste the repository URL in the search field: `https://github.com/SagarSDagdu/SDBeaconScanner.git`
+3. Paste the repository URL in the search field:
+```
+https://github.com/SagarSDagdu/SDBeaconScanner.git
+```
 4. Choose the package and add it to your project.
 
 ### Manually
