@@ -3,17 +3,17 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 60;
+	objectVersion = 56;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		ACB6DF092C731A17008F4C71 /* SDBeaconScanner in Frameworks */ = {isa = PBXBuildFile; productRef = ACB6DF082C731A17008F4C71 /* SDBeaconScanner */; };
 		ACCD55B82C70720F00FD57E2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACCD55B72C70720F00FD57E2 /* AppDelegate.swift */; };
 		ACCD55BA2C70720F00FD57E2 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACCD55B92C70720F00FD57E2 /* SceneDelegate.swift */; };
 		ACCD55BC2C70720F00FD57E2 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACCD55BB2C70720F00FD57E2 /* ViewController.swift */; };
 		ACCD55BF2C70720F00FD57E2 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = ACCD55BE2C70720F00FD57E2 /* Base */; };
 		ACCD55C12C70721100FD57E2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = ACCD55C02C70721100FD57E2 /* Assets.xcassets */; };
 		ACCD55C42C70721100FD57E2 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = ACCD55C32C70721100FD57E2 /* Base */; };
-		ACCD55D72C7238B100FD57E2 /* SDBeaconScanner in Frameworks */ = {isa = PBXBuildFile; productRef = ACCD55D62C7238B100FD57E2 /* SDBeaconScanner */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,7 +32,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				ACCD55D72C7238B100FD57E2 /* SDBeaconScanner in Frameworks */,
+				ACB6DF092C731A17008F4C71 /* SDBeaconScanner in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -94,7 +94,7 @@
 			);
 			name = SDBeaconScannerExample;
 			packageProductDependencies = (
-				ACCD55D62C7238B100FD57E2 /* SDBeaconScanner */,
+				ACB6DF082C731A17008F4C71 /* SDBeaconScanner */,
 			);
 			productName = SDBeaconScannerExample;
 			productReference = ACCD55B42C70720F00FD57E2 /* SDBeaconScannerExample.app */;
@@ -125,7 +125,6 @@
 			);
 			mainGroup = ACCD55AB2C70720F00FD57E2;
 			packageReferences = (
-				ACCD55D52C7238B100FD57E2 /* XCLocalSwiftPackageReference "SDBeaconScanner" */,
 			);
 			productRefGroup = ACCD55B52C70720F00FD57E2 /* Products */;
 			projectDirPath = "";
@@ -394,15 +393,8 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCLocalSwiftPackageReference section */
-		ACCD55D52C7238B100FD57E2 /* XCLocalSwiftPackageReference "SDBeaconScanner" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = SDBeaconScanner;
-		};
-/* End XCLocalSwiftPackageReference section */
-
 /* Begin XCSwiftPackageProductDependency section */
-		ACCD55D62C7238B100FD57E2 /* SDBeaconScanner */ = {
+		ACB6DF082C731A17008F4C71 /* SDBeaconScanner */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SDBeaconScanner;
 		};
