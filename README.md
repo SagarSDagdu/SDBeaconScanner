@@ -32,7 +32,7 @@ SDBeaconScanner is a Swift library for scanning Bluetooth beacons using CoreLoca
 
 - iOS 13.0+
 - Swift 5.0+
-- CoreLocation framework
+- `CoreLocation` framework
 
 ## Installation
 
