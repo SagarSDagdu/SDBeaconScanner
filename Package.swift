@@ -13,7 +13,12 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "SDBeaconScanner"),
+            name: "SDBeaconScanner",
+            dependencies: [],
+            linkerSettings: [
+                .linkedFramework("CoreLocation"),
+            ]
+        ),
         .testTarget(
             name: "SDBeaconScannerTests",
             dependencies: ["SDBeaconScanner"]
