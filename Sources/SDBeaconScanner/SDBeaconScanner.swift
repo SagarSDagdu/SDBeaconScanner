@@ -99,7 +99,7 @@ public final class SDBeaconScanner: NSObject {
 
      ### Behavior
      - The scan will start for beacons matching the provided UUID, major, and minor values.
-     - The scan will automatically stop after 30 seconds if no beacons are found.
+     - The scan will automatically stop after `timeout` seconds if no beacons are found.
      - If any beacons are found before the timeout, the scan will stop and report the results immediately.
      - If a scan is already in progress, it will stop and a new one will begin.
 
@@ -135,14 +135,15 @@ extension SDBeaconScanner: CLLocationManagerDelegate {
                 by: 5.0
             )
 
-            let hasFoundBeacons = !self.foundBeacons.isEmpty
+            let newBeaconFound = self.processRangedBeacons(rangedBeacons: beacons)
 
-            self.processRangedBeacons(rangedBeacons: beacons)
-
-            if isTimeUp, hasFoundBeacons {
-                // If beacons have been found and the time is up, stop scanning
-                print("Stopping beacon scan due to found beacons \(Date.currentMillis())")
+            if isTimeUp && !newBeaconFound {
+                // Stop scanning if the time is up and no new beacons were found since last scan
+                consoleLog("Stopping beacon scan due to found beacons \(Date.currentMillis())")
                 self.stopScanningAndReportResults(error: nil)
+            } else {
+                // If we found new beacons since last scan, we do not stop scanning
+                consoleLog("Beacon scan still in progress...")
             }
         }
     }
@@ -167,18 +168,18 @@ private extension SDBeaconScanner {
         completion: @escaping BeaconScanningCompletion
     ) {
         if scanStartTimestampMillis > 0 {
-            print("Beacon scan already in progress, stopping it")
+            consoleLog("Beacon scan already in progress, stopping it")
             stopScanningAndReportResults(error: nil)
         }
 
         guard let uuidToScan = UUID(uuidString: uuid) else {
-            print("Invalid UUID \(uuid)")
+            consoleLog("Invalid UUID \(uuid)")
             completion([], BeaconScannerError.invalidUUID)
             return
         }
 
         guard CLLocationManager.isRangingAvailable() else {
-            print("Ranging is unavailable")
+            consoleLog("Ranging is unavailable")
             completion([], BeaconScannerError.rangingUnavailable)
             return
         }
@@ -193,10 +194,10 @@ private extension SDBeaconScanner {
                 major: major,
                 minor: minor
             )
-            print("Starting beacon scan for UUID: \(uuidToScan), Major: \(major), Minor: \(minor)")
+            consoleLog("Starting beacon scan for UUID: \(uuidToScan), Major: \(major), Minor: \(minor)")
         } else {
             beaconIdentityConstraint = CLBeaconIdentityConstraint(uuid: uuidToScan)
-            print("Starting beacon scan for UUID: \(uuidToScan)")
+            consoleLog("Starting beacon scan for UUID: \(uuidToScan)")
         }
 
         // Save the start timestamp
@@ -217,27 +218,33 @@ private extension SDBeaconScanner {
         let timer = DispatchSource.makeTimerSource(queue: beaconScanningQueue)
         timer.schedule(deadline: .now() + timeout)
         timer.setEventHandler { [weak self] in
-            print("Stopping beacon scan due to timeout \(Date.currentMillis())")
+            consoleLog("Stopping beacon scan due to timeout \(Date.currentMillis())")
             self?.stopScanningAndReportResults(error: nil)
         }
         timer.resume()
         noBeaconsFoundTimeoutTimer = timer
     }
 
-    func processRangedBeacons(rangedBeacons: [CLBeacon]) {
+    func processRangedBeacons(rangedBeacons: [CLBeacon]) -> Bool {
         let currentTimestampMillis = Date.currentMillis()
 
+        var newBeaconFound = false
         for beacon in rangedBeacons {
             if let index = foundBeacons.firstIndex(where: { $0.beacon.uuid == beacon.uuid && $0.beacon.major == beacon.major && $0.beacon.minor == beacon.minor }) {
+                
                 // Update existing beacon with new timestamp
                 foundBeacons[index] = TimestampedBeacon(
                     beacon: beacon,
                     timestamp: currentTimestampMillis
                 )
+                
+                consoleLog("Updated existing beacon with UUID: \(beacon.uuid.uuidString), Major: \(beacon.major.intValue), Minor: \(beacon.minor.intValue)")
             } else {
                 // Add new beacon
                 let newBeacon = TimestampedBeacon(beacon: beacon, timestamp: currentTimestampMillis)
                 foundBeacons.append(newBeacon)
+                newBeaconFound = true
+                consoleLog("Found new beacon with UUID: \(beacon.uuid.uuidString), Major: \(beacon.major.intValue), Minor: \(beacon.minor.intValue)")
             }
         }
 
@@ -245,17 +252,19 @@ private extension SDBeaconScanner {
         foundBeacons.sort {
             $0.beacon.proximity.rawValue < $1.beacon.proximity.rawValue
         }
+        
+        return newBeaconFound
     }
 
     func stopScanningAndReportResults(error: Error?) {
         if let error = error {
-            print("Beacon scanning failed with error: \(error)")
+            consoleLog("Beacon scanning failed with error: \(error)")
             completionHandler?([], error)
             resetState()
         }
 
         guard let beaconIdentityConstraint = beaconIdentityConstraint else {
-            print("Error: Beacon identity constraint is nil, cannot stop ranging beacons")
+            consoleLog("Error: Beacon identity constraint is nil, cannot stop ranging beacons")
             resetState()
             return
         }
@@ -268,7 +277,7 @@ private extension SDBeaconScanner {
             $0.toBeacon()
         }
 
-        print("Found \(beaconsToReport.count) beacons, notifying via completion handler")
+        consoleLog("Found \(beaconsToReport.count) beacons, notifying via completion handler")
 
         completionHandler?(beaconsToReport, error)
 
@@ -276,7 +285,7 @@ private extension SDBeaconScanner {
     }
 
     func resetState() {
-        print("Resetting state")
+        consoleLog("Resetting state")
 
         beaconIdentityConstraint = nil
         noBeaconsFoundTimeoutTimer?.cancel()
@@ -285,4 +294,12 @@ private extension SDBeaconScanner {
         foundBeacons.removeAll()
         scanStartTimestampMillis = 0
     }
+}
+
+func consoleLog(_ items: Any...) {
+    #if DEBUG
+    for item in items {
+        Swift.print("\(item)")
+    }
+    #endif
 }

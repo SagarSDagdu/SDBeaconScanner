@@ -30,16 +30,3 @@ public struct Beacon {
     /// The most recent timestamp representing when the beacon was observed
     let timestamp: Int64
 }
-
-extension Beacon: Equatable {
-    /// Check if two beacons are equal
-    /// - Parameters:
-    ///   - lhs: The left hand side beacon
-    ///   - rhs: The right hand side beacon
-    /// - Returns: A boolean indicating if the two beacons are
-    public static func == (lhs: Beacon, rhs: Beacon) -> Bool {
-        lhs.uuid == rhs.uuid &&
-            lhs.major == rhs.major &&
-            lhs.minor == rhs.minor
-    }
-}
