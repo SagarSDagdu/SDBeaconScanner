@@ -54,7 +54,7 @@ To enable scanning for beacons while your app is in the background, ensure that 
 </array>
 ```
 
-## Usage
+## 🧑🏻‍💻 Usage
 
 ### 1. Importing the Library
 
@@ -143,6 +143,10 @@ if let error = error as? BeaconScannerError {
 }
 ```
 
-## License
+## 📄 Example
+
+You can find a simple example project in the [Example](/Example) directory. The example demonstrates how to scan for beacons using `SDBeaconScanner`.
+
+## 🪪 License
 
 SDBeaconScanner is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
