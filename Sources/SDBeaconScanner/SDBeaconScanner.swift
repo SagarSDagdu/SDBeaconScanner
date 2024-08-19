@@ -43,10 +43,7 @@ public final class SDBeaconScanner: NSObject {
     private var noBeaconsFoundTimeoutTimer: DispatchSourceTimer?
 
     private var scanStartTimestampMillis: Int64 = 0
-    
-    /// The timeout duration for the beacon scan. If no beacons are found within this time, the scan will stop and an empty array will be returned through the completion handler.
-    private let scanTimeoutSeconds: TimeInterval = 15.0
-    
+        
     /// The location manager used for ranging beacons
     private let locationManager: CLLocationManager
 
@@ -67,11 +64,12 @@ public final class SDBeaconScanner: NSObject {
      Starts scanning for beacons with a specified UUID.
 
      - Parameter uuid: The UUID string of the beacons to scan for.
+     - Parameter timeout: The timeout duration (in seconds) for the scan. If no beacons are found within this time, the scan will stop and an empty array will be returned through the completion handler. If you do not not pass a value, the default timeout duration is 15 seconds.
      - Parameter completion: A closure that gets called once the scan completes, either due to timeout or because beacons were found. The closure receives an array of ``Beacon`` objects and an optional error.
 
      ### Behavior
      - The scan will start for beacons matching the provided UUID.
-     - The scan will automatically stop after 30 seconds if no beacons are found.
+     - The scan will automatically stop after `timeout` seconds if no beacons are found.
      - If any beacons are found before the timeout, the scan will stop and report the results immediately.
      - If a scan is already in progress, it will stop and a new one will begin.
 
@@ -79,12 +77,14 @@ public final class SDBeaconScanner: NSObject {
      */
     public func getNearbyBeacons(
         uuid: String,
+        timeout: TimeInterval = 15.0,
         completion: @escaping BeaconScanningCompletion
     ) {
         // Call the private method with only UUID
         startBeaconScan(uuid: uuid,
                         major: nil,
                         minor: nil,
+                        timeout: timeout,
                         completion: completion)
     }
 
@@ -94,6 +94,7 @@ public final class SDBeaconScanner: NSObject {
      - Parameter uuid: The UUID string of the beacons to scan for.
      - Parameter major: The major value of the beacons to scan for.
      - Parameter minor: The minor value of the beacons to scan for.
+     - Parameter timeout: The timeout duration (in seconds) for the scan. If no beacons are found within this time, the scan will stop and an empty array will be returned through the completion handler. If you do not not pass a value, the default timeout duration is 15 seconds.
      - Parameter completion: A closure that gets called once the scan completes, either due to timeout or because beacons were found. The closure receives an array of ``Beacon`` objects and an optional error.
 
      ### Behavior
@@ -108,12 +109,14 @@ public final class SDBeaconScanner: NSObject {
         uuid: String,
         major: UInt16,
         minor: UInt16,
+        timeout: TimeInterval = 15.0,
         completion: @escaping BeaconScanningCompletion
     ) {
         // Call the private method with UUID, major, and minor values
         startBeaconScan(uuid: uuid,
                         major: major,
                         minor: minor,
+                        timeout: timeout,
                         completion: completion)
     }
 }
@@ -160,6 +163,7 @@ private extension SDBeaconScanner {
         uuid: String,
         major: UInt16?,
         minor: UInt16?,
+        timeout: TimeInterval,
         completion: @escaping BeaconScanningCompletion
     ) {
         if scanStartTimestampMillis > 0 {
@@ -202,16 +206,16 @@ private extension SDBeaconScanner {
         locationManager.startRangingBeacons(satisfying: beaconIdentityConstraint!)
 
         // Set up the timeout timer to stop scanning after a timeout
-        setupTimeoutTimer()
+        setupTimeoutTimer(timeout: timeout)
     }
 
-    func setupTimeoutTimer() {
+    func setupTimeoutTimer(timeout: TimeInterval) {
         // Ensure previous timer is cancelled
         noBeaconsFoundTimeoutTimer?.cancel()
 
         // Create a new timer
         let timer = DispatchSource.makeTimerSource(queue: beaconScanningQueue)
-        timer.schedule(deadline: .now() + self.scanTimeoutSeconds)
+        timer.schedule(deadline: .now() + timeout)
         timer.setEventHandler { [weak self] in
             print("Stopping beacon scan due to timeout \(Date.currentMillis())")
             self?.stopScanningAndReportResults(error: nil)
