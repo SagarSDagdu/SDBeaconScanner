@@ -19,7 +19,7 @@ class ViewController: UIViewController {
     }
 
     @IBAction func scanBeaconsTapped(_: Any) {
-        SDBeaconScanner.shared.getNearbyBeacons(uuid: "8A1A407A-57C4-4565-A6C8-7C9D4F2BC56B") { beacons, error in
+        SDBeaconScanner.shared.getNearbyBeacons(uuid: "8A1A407A-57C4-4565-A6C8-7C9D4F2BC56A") { beacons, error in
             if let error = error {
                 print("Error: \(error)")
             } else {
