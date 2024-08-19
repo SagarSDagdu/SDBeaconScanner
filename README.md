@@ -25,3 +25,5 @@ Add the following line to your `Package.swift` file:
 
 ```swift
 .package(url: "https://github.com/SagarSDagdu/SDBeaconScanner.git", from: "1.0.0")
+```
+
