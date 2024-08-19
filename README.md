@@ -3,6 +3,24 @@
 
 SDBeaconScanner is a Swift library for scanning Bluetooth beacons using CoreLocation's beacon ranging API. It simplifies scanning for beacons by providing an easy-to-use API with support for UUID, major, and minor identifiers. Additionally, the scanner allows you to specify a timeout for the scan and handles beacon detection results through completion handlers.
 
+## Table of Contents
+
+1. [Features](#features)
+2. [Requirements](#requirements)
+3. [Installation](#installation)
+    - [Swift Package Manager](#swift-package-manager)
+    - [Manually](#manually)
+4. [Permissions](#permissions)
+5. [Project Configuration](#project-configuration)
+6. [Usage](#usage)
+    - [Importing the Library](#1-importing-the-library)
+    - [Initializing the Scanner](#2-initializing-the-scanner)
+    - [Scanning for Beacons](#3-scanning-for-beacons)
+    - [Customizing the Timeout](#4-customizing-the-timeout)
+    - [Handling Results and Errors](#5-handling-results-and-errors)
+7. [Example](#example)
+8. [License](#license)
+
 ## 🚀 Features
 
 - **Beacon Scanning:** Scan for nearby Bluetooth beacons by UUID, with optional major and minor values.
@@ -44,7 +62,8 @@ Ensure that your app includes the necessary permissions in `Info.plist` to use l
 ```
 
 ## 🔧 Project Configuration
-Background Location Updates
+
+### Background Location Updates
 To enable scanning for beacons while your app is in the background, ensure that your app has the correct background modes enabled in Info.plist:
 
 ```xml
