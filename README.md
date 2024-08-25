@@ -99,13 +99,12 @@ To start scanning for beacons, you can use either of the following methods depen
 #### Scan by UUID
 
 ```swift
-beaconScanner.getNearbyBeacons(uuid: "your-uuid") { beacons, error in
-    if let error = error {
-        // Handle error
-        print("Error scanning beacons: \(error)")
-    } else {
-        // Handle found beacons
-        print("Found beacons: \(beacons)")
+beaconScanner.getNearbyBeacons(uuid: "your-uuid") { scanResult in
+     switch scanResult {
+        case let .success(beacons):
+             print("Got \(beacons.count) beacons")
+        case let .failure(scanError):
+             print("Error: \(scanError)")
     }
 }
 ```
@@ -113,13 +112,12 @@ beaconScanner.getNearbyBeacons(uuid: "your-uuid") { beacons, error in
 #### Scan by UUID, Major, and Minor
 
 ```swift
-beaconScanner.getNearbyBeacons(uuid: "your-uuid", major: 123, minor: 456) { beacons, error in
-    if let error = error {
-        // Handle error
-        print("Error scanning beacons: \(error)")
-    } else {
-        // Handle found beacons
-        print("Found beacons: \(beacons)")
+beaconScanner.getNearbyBeacons(uuid: "your-uuid", major: 123, minor: 456) { scanResult in
+     switch scanResult {
+        case let .success(beacons):
+             print("Got \(beacons.count) beacons")
+        case let .failure(scanError):
+             print("Error: \(scanError)")
     }
 }
 ```
@@ -129,11 +127,12 @@ beaconScanner.getNearbyBeacons(uuid: "your-uuid", major: 123, minor: 456) { beac
 You can specify a custom timeout duration (in seconds) for the scan. The scan will automatically stop once the timeout is reached or once beacons are found.
 
 ```swift
-beaconScanner.getNearbyBeacons(uuid: "your-uuid", timeout: 10.0) { beacons, error in
-    if let error = error {
-        print("Error scanning beacons: \(error)")
-    } else {
-        print("Found beacons: \(beacons)")
+beaconScanner.getNearbyBeacons(uuid: "your-uuid", timeout: 10.0) { scanResult in
+    switch scanResult {
+        case let .success(beacons):
+             print("Got \(beacons.count) beacons")
+        case let .failure(scanError):
+             print("Error: \(scanError)")
     }
 }
 ```
@@ -148,12 +147,11 @@ SDBeaconScanner provides detailed error handling through the `BeaconScannerError
 
 - `invalidUUID`: Indicates that the provided UUID is not valid.
 - `rangingUnavailable`: Indicates that the device does not support ranging.
-- `rangingFailed(NSError)`: A generic error that reports an NSError object, typically triggered by internal location manager issues.
+- `rangingFailed(NSError)`: A generic error that reports an `NSError` object, typically triggered by internal location manager issues.
 
 Example usage:
 
 ```swift
-if let error = error as? BeaconScannerError {
     switch error {
     case .invalidUUID:
         print("The UUID provided is invalid.")
@@ -162,7 +160,6 @@ if let error = error as? BeaconScannerError {
     case .rangingFailed(let nsError):
         print("Ranging failed with error: \(nsError.localizedDescription)")
     }
-}
 ```
 
 ## Example
