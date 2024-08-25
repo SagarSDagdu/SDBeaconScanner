@@ -8,7 +8,7 @@
 import CoreLocation
 
 /// Completion handler for the beacon scanning operation.
-public typealias BeaconScanningCompletion = ([Beacon], Error?) -> Void
+public typealias BeaconScanningCompletion = (Result<[Beacon], BeaconScannerError>) -> Void
 
 /// Errors that can be reported by the beacon scanner
 public enum BeaconScannerError: Error {
@@ -18,7 +18,7 @@ public enum BeaconScannerError: Error {
     /// Ranging is unavailable on the device
     case rangingUnavailable
 
-    /// A generic error with an associated ``NSError`` object. This error will be reported when the location manager notifies and error through the `didFailRangingFor` delegate method
+    /// A generic error with an associated `NSError` object. This error will be reported when the location manager notifies and error through the `didFailRangingFor` delegate method
     case rangingFailed(NSError)
 }
 
@@ -65,7 +65,7 @@ public final class SDBeaconScanner: NSObject {
 
      - Parameter uuid: The UUID string of the beacons to scan for.
      - Parameter timeout: The timeout duration (in seconds) for the scan. If no beacons are found within this time, the scan will stop and an empty array will be returned through the completion handler. If you do not not pass a value, the default timeout duration is 15 seconds.
-     - Parameter completion: A closure that gets called once the scan completes, either due to timeout or because beacons were found. The closure receives an array of ``Beacon`` objects and an optional error.
+     - Parameter completion: A closure that gets called once the scan completes, either due to timeout or because beacons were found. The closure receives a `Result` which can be an array of ``Beacon`` objects in case beacons are found or the scan times out,  or a  ``BeaconScannerError`` if an error occurs
 
      ### Behavior
      - The scan will start for beacons matching the provided UUID.
@@ -95,7 +95,7 @@ public final class SDBeaconScanner: NSObject {
      - Parameter major: The major value of the beacons to scan for.
      - Parameter minor: The minor value of the beacons to scan for.
      - Parameter timeout: The timeout duration (in seconds) for the scan. If no beacons are found within this time, the scan will stop and an empty array will be returned through the completion handler. If you do not not pass a value, the default timeout duration is 15 seconds.
-     - Parameter completion: A closure that gets called once the scan completes, either due to timeout or because beacons were found. The closure receives an array of ``Beacon`` objects and an optional error.
+     - Parameter completion: A closure that gets called once the scan completes, either due to timeout or because beacons were found. The closure receives a `Result` which can be an array of ``Beacon`` objects in case beacons are found or the scan times out,  or a  ``BeaconScannerError`` if an error occurs
 
      ### Behavior
      - The scan will start for beacons matching the provided UUID, major, and minor values.
@@ -174,13 +174,13 @@ private extension SDBeaconScanner {
 
         guard let uuidToScan = UUID(uuidString: uuid) else {
             consoleLog("Invalid UUID \(uuid)")
-            completion([], BeaconScannerError.invalidUUID)
+            completion(.failure(.invalidUUID))
             return
         }
 
         guard CLLocationManager.isRangingAvailable() else {
             consoleLog("Ranging is unavailable")
-            completion([], BeaconScannerError.rangingUnavailable)
+            completion(.failure(.rangingUnavailable))
             return
         }
 
@@ -258,7 +258,7 @@ private extension SDBeaconScanner {
     func stopScanningAndReportResults(error: Error?) {
         if let error = error {
             consoleLog("Beacon scanning failed with error: \(error)")
-            completionHandler?([], error)
+            completionHandler?(.failure(.rangingFailed(error as NSError)))
             resetState()
         }
 
@@ -278,7 +278,7 @@ private extension SDBeaconScanner {
 
         consoleLog("Found \(beaconsToReport.count) beacons, notifying via completion handler")
 
-        completionHandler?(beaconsToReport, error)
+        completionHandler?(.success(beaconsToReport))
 
         resetState()
     }
