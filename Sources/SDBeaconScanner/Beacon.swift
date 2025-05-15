@@ -10,23 +10,23 @@ import CoreLocation
 /// A struct representing a beacon that has been scanned.
 public struct Beacon {
     /// The UUID of the scanned beacon.
-    let uuid: String
+    public let uuid: String
 
     /// The major of the scanned beacon.
-    let major: Int
+    public let major: Int
 
     /// The minor of the scanned beacon
-    let minor: Int
+    public let minor: Int
 
     /// The RSSI of the scanned beacon
-    let rssi: Int
+    public let rssi: Int
 
     /// The proximity of the scanned beacon
-    let proximity: CLProximity
+    public let proximity: CLProximity
 
     /// The accuracy of the proximity value, measured in meters from the beacon
-    let accuracy: CLLocationAccuracy
+    public let accuracy: CLLocationAccuracy
 
     /// The most recent timestamp representing when the beacon was observed
-    let timestamp: Int64
+    public let timestamp: Int64
 }
