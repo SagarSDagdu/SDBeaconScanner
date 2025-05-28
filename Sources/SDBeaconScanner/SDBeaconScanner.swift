@@ -49,6 +49,10 @@ public final class SDBeaconScanner: NSObject {
 
     /// The shared singleton instance of the beacon scanner
     public static let shared = SDBeaconScanner()
+    
+    /// The timeout duration (in seconds) for the scan when no new beacons are found. Default is 5 seconds.
+    /// This timeout is used to stop the scan if no new beacons are found since the last ranging event.
+    private var noNewBeaconsTimeoutSeconds: TimeInterval = 5.0
 
     override private init() {
         locationManager = CLLocationManager()
@@ -65,6 +69,7 @@ public final class SDBeaconScanner: NSObject {
 
      - Parameter uuid: The UUID string of the beacons to scan for.
      - Parameter timeout: The timeout duration (in seconds) for the scan. If no beacons are found within this time, the scan will stop and an empty array will be returned through the completion handler. If you do not not pass a value, the default timeout duration is 15 seconds.
+     - Parameter noNewBeaconsTimeoutSeconds: The timeout duration (in seconds) to stop the scan if no new beacons are found since the last ranging event. Default is 5 seconds. If the set of beacons does not change within this time, the scan will stop and the results will be reported.
      - Parameter completion: A closure that gets called once the scan completes, either due to timeout or because beacons were found. The closure receives a `Result` which can be an array of ``Beacon`` objects in case beacons are found or the scan times out,  or a  ``BeaconScannerError`` if an error occurs
 
      ### Behavior
@@ -78,8 +83,12 @@ public final class SDBeaconScanner: NSObject {
     public func getNearbyBeacons(
         uuid: String,
         timeout: TimeInterval = 15.0,
+        noNewBeaconsTimeoutSeconds: TimeInterval = 5.0,
         completion: @escaping BeaconScanningCompletion
     ) {
+        // Set the timeout for no new beacons found
+        self.noNewBeaconsTimeoutSeconds = noNewBeaconsTimeoutSeconds
+        
         // Call the private method with only UUID
         startBeaconScan(uuid: uuid,
                         major: nil,
@@ -132,7 +141,7 @@ extension SDBeaconScanner: CLLocationManagerDelegate {
 
             let isTimeUp = Date.isTimeAhead(
                 of: self.scanStartTimestampMillis,
-                by: 5.0
+                by: noNewBeaconsTimeoutSeconds
             )
 
             let newBeaconFound = self.processRangedBeacons(rangedBeacons: beacons)
@@ -292,6 +301,7 @@ private extension SDBeaconScanner {
         noBeaconsFoundTimeoutTimer = nil
         foundBeacons.removeAll()
         scanStartTimestampMillis = 0
+        noNewBeaconsTimeoutSeconds = 5.0
     }
 }
 
