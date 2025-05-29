@@ -26,7 +26,7 @@ public enum BeaconScannerError: Error {
  A class that handles scanning for Bluetooth beacons using CoreLocation's beacon ranging API.
 
  The class allows you to start scanning for beacons based on their UUID, and optionally major and minor values. It utilizes CoreLocation's `CLLocationManager` for beacon scanning and provides a timeout mechanism to ensure that scanning doesn't run indefinitely.
- After a set time (default: 20 seconds) or once beacons are found, the scan automatically stops, and the results are reported to the caller via the provided completion handler.
+ After a set time (default: 15 seconds) or once beacons are found, the scan automatically stops, and the results are reported to the caller via the provided completion handler.
 
  The class is designed as a singleton (``SDBeaconScanner/shared``) to ensure there is only one instance managing beacon scans at a time.
  */
@@ -50,6 +50,12 @@ public final class SDBeaconScanner: NSObject {
     /// The shared singleton instance of the beacon scanner
     public static let shared = SDBeaconScanner()
     
+    /// The timestamp (in milliseconds since epoch) when new beacons were last discovered during the current scan.
+    /// This is used in conjunction with `noNewBeaconsTimeoutSeconds` to determine when to stop scanning
+    /// if no new beacons have been found for the specified timeout duration.
+    /// The value is initialized when a scan starts and updated whenever new beacons are discovered.
+    private var lastNewBeaconFoundTimestampMillis: Int64 = 0
+
     /// The timeout duration (in seconds) for the scan when no new beacons are found. Default is 5 seconds.
     /// This timeout is used to stop the scan if no new beacons are found since the last ranging event.
     private var noNewBeaconsTimeoutSeconds: TimeInterval = 5.0
@@ -75,7 +81,7 @@ public final class SDBeaconScanner: NSObject {
      ### Behavior
      - The scan will start for beacons matching the provided UUID.
      - The scan will automatically stop after `timeout` seconds if no beacons are found.
-     - If any beacons are found before the timeout, the scan will stop and report the results immediately.
+     - If any beacons are found before the timeout, the scan will stop and report the results after `noNewBeaconsTimeoutSeconds` seconds elapse without finding new beacons.
      - If a scan is already in progress, it will stop and a new one will begin.
 
      - Note: Ensure that location permissions are correctly configured for the app, including background location permission.
@@ -104,12 +110,13 @@ public final class SDBeaconScanner: NSObject {
      - Parameter major: The major value of the beacons to scan for.
      - Parameter minor: The minor value of the beacons to scan for.
      - Parameter timeout: The timeout duration (in seconds) for the scan. If no beacons are found within this time, the scan will stop and an empty array will be returned through the completion handler. If you do not not pass a value, the default timeout duration is 15 seconds.
+     - Parameter noNewBeaconsTimeoutSeconds: The timeout duration (in seconds) to stop the scan if no new beacons are found since the last ranging event. Default is 5 seconds. If the set of beacons does not change within this time, the scan will stop and the results will be reported.
      - Parameter completion: A closure that gets called once the scan completes, either due to timeout or because beacons were found. The closure receives a `Result` which can be an array of ``Beacon`` objects in case beacons are found or the scan times out,  or a  ``BeaconScannerError`` if an error occurs
 
      ### Behavior
      - The scan will start for beacons matching the provided UUID, major, and minor values.
      - The scan will automatically stop after `timeout` seconds if no beacons are found.
-     - If any beacons are found before the timeout, the scan will stop and report the results immediately.
+     - If any beacons are found before the timeout, the scan will stop and report the results after `noNewBeaconsTimeoutSeconds` seconds elapse without finding new beacons.
      - If a scan is already in progress, it will stop and a new one will begin.
 
      - Note: Ensure that location permissions are correctly configured for the app, including background location permission.
@@ -119,6 +126,7 @@ public final class SDBeaconScanner: NSObject {
         major: UInt16,
         minor: UInt16,
         timeout: TimeInterval = 15.0,
+        noNewBeaconsTimeoutSeconds: TimeInterval = 5.0,
         completion: @escaping BeaconScanningCompletion
     ) {
         // Call the private method with UUID, major, and minor values
@@ -139,19 +147,25 @@ extension SDBeaconScanner: CLLocationManagerDelegate {
         beaconScanningQueue.async { [weak self] in
             guard let self = self else { return }
 
-            let isTimeUp = Date.isTimeAhead(
-                of: self.scanStartTimestampMillis,
-                by: noNewBeaconsTimeoutSeconds
-            )
-
             let newBeaconFound = self.processRangedBeacons(rangedBeacons: beacons)
-
-            if isTimeUp, !newBeaconFound {
-                // Stop scanning if the time is up and no new beacons were found since last scan
-                consoleLog("Stopping beacon scan due to found beacons \(Date.currentMillis())")
-                self.stopScanningAndReportResults(error: nil)
+            
+            // Only check noNewBeaconsTimeout if we have found beacons before
+            if self.foundBeacons.count > 0 {
+                let isNoNewBeaconsTimeUp = Date.isTimeAhead(
+                    of: self.lastNewBeaconFoundTimestampMillis,
+                    by: noNewBeaconsTimeoutSeconds
+                )
+                
+                if isNoNewBeaconsTimeUp && !newBeaconFound {
+                    consoleLog("Stopping beacon scan - no new beacons found for \(noNewBeaconsTimeoutSeconds) seconds")
+                    self.stopScanningAndReportResults(error: nil)
+                    return
+                }
+            }
+            
+            if newBeaconFound {
+                consoleLog("New beacon found, continuing scan...")
             } else {
-                // If we found new beacons since last scan, we do not stop scanning
                 consoleLog("Beacon scan still in progress...")
             }
         }
@@ -255,6 +269,11 @@ private extension SDBeaconScanner {
                 consoleLog("Found new beacon with UUID: \(beacon.uuid.uuidString), Major: \(beacon.major.intValue), Minor: \(beacon.minor.intValue)")
             }
         }
+        
+        // Update timestamp whenever ANY new beacon is found
+        if newBeaconFound {
+            lastNewBeaconFoundTimestampMillis = currentTimestampMillis
+        }
 
         // Sort beacons by proximity for consistent ordering
         foundBeacons.sort {
@@ -302,6 +321,7 @@ private extension SDBeaconScanner {
         foundBeacons.removeAll()
         scanStartTimestampMillis = 0
         noNewBeaconsTimeoutSeconds = 5.0
+        lastNewBeaconFoundTimestampMillis = 0
     }
 }
 
