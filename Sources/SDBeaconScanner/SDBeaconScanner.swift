@@ -92,14 +92,13 @@ public final class SDBeaconScanner: NSObject {
         noNewBeaconsTimeoutSeconds: TimeInterval = 5.0,
         completion: @escaping BeaconScanningCompletion
     ) {
-        // Set the timeout for no new beacons found
-        self.noNewBeaconsTimeoutSeconds = noNewBeaconsTimeoutSeconds
         
         // Call the private method with only UUID
         startBeaconScan(uuid: uuid,
                         major: nil,
                         minor: nil,
                         timeout: timeout,
+                        noNewBeaconsTimeoutSeconds: noNewBeaconsTimeoutSeconds,
                         completion: completion)
     }
 
@@ -134,6 +133,7 @@ public final class SDBeaconScanner: NSObject {
                         major: major,
                         minor: minor,
                         timeout: timeout,
+                        noNewBeaconsTimeoutSeconds: noNewBeaconsTimeoutSeconds,
                         completion: completion)
     }
 }
@@ -188,6 +188,7 @@ private extension SDBeaconScanner {
         major: UInt16?,
         minor: UInt16?,
         timeout: TimeInterval,
+        noNewBeaconsTimeoutSeconds: TimeInterval,
         completion: @escaping BeaconScanningCompletion
     ) {
         if scanStartTimestampMillis > 0 {
@@ -209,6 +210,9 @@ private extension SDBeaconScanner {
 
         // Assign the completion handler
         completionHandler = completion
+        
+        // Set the noNewBeaconsTimeoutSeconds
+        self.noNewBeaconsTimeoutSeconds = noNewBeaconsTimeoutSeconds
 
         // Create a constraint based on the presence of major and minor values
         if let major = major, let minor = minor {
