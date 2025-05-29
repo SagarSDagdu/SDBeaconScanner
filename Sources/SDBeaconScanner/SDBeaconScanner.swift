@@ -74,8 +74,8 @@ public final class SDBeaconScanner: NSObject {
      Starts scanning for beacons with a specified UUID.
 
      - Parameter uuid: The UUID string of the beacons to scan for.
-     - Parameter timeout: The timeout duration (in seconds) for the scan. If no beacons are found within this time, the scan will stop and an empty array will be returned through the completion handler. If you do not not pass a value, the default timeout duration is 15 seconds.
-     - Parameter noNewBeaconsTimeoutSeconds: The timeout duration (in seconds) to stop the scan if no new beacons are found since the last ranging event. Default is 5 seconds. If the set of beacons does not change within this time, the scan will stop and the results will be reported.
+     - Parameter timeout: The timeout duration (in seconds) for the scan. If no beacons are found within this time, the scan will stop and an empty array will be returned through the completion handler. If you do not pass a value, the default timeout duration is 15 seconds.
+     - Parameter noNewBeaconsTimeoutSeconds: The timeout duration (in seconds) to stop the scan if no new beacons are found since the last newly found beacon. Default is 5 seconds. If the set of beacons does not change within this time, the scan will stop and the results will be reported.
      - Parameter completion: A closure that gets called once the scan completes, either due to timeout or because beacons were found. The closure receives a `Result` which can be an array of ``Beacon`` objects in case beacons are found or the scan times out,  or a  ``BeaconScannerError`` if an error occurs
 
      ### Behavior
@@ -108,8 +108,8 @@ public final class SDBeaconScanner: NSObject {
      - Parameter uuid: The UUID string of the beacons to scan for.
      - Parameter major: The major value of the beacons to scan for.
      - Parameter minor: The minor value of the beacons to scan for.
-     - Parameter timeout: The timeout duration (in seconds) for the scan. If no beacons are found within this time, the scan will stop and an empty array will be returned through the completion handler. If you do not not pass a value, the default timeout duration is 15 seconds.
-     - Parameter noNewBeaconsTimeoutSeconds: The timeout duration (in seconds) to stop the scan if no new beacons are found since the last ranging event. Default is 5 seconds. If the set of beacons does not change within this time, the scan will stop and the results will be reported.
+     - Parameter timeout: The timeout duration (in seconds) for the scan. If no beacons are found within this time, the scan will stop and an empty array will be returned through the completion handler. If you do not pass a value, the default timeout duration is 15 seconds.
+     - Parameter noNewBeaconsTimeoutSeconds: The timeout duration (in seconds) to stop the scan if no new beacons are found since the last newly found beacon. Default is 5 seconds. If the set of beacons does not change within this time, the scan will stop and the results will be reported.
      - Parameter completion: A closure that gets called once the scan completes, either due to timeout or because beacons were found. The closure receives a `Result` which can be an array of ``Beacon`` objects in case beacons are found or the scan times out,  or a  ``BeaconScannerError`` if an error occurs
 
      ### Behavior
